@@ -28,8 +28,7 @@ class Compareitems extends Module {
         return parent::install() &&
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayProductPriceBlock') &&
-            $this->registerHook('displayProductListReviews') &&
-            Configuration::updateValue('MYMODULE_NAME', 'compareitems');
+            $this->registerHook('displayProductListReviews');
     }
 
     public function uninstall()
@@ -42,9 +41,13 @@ class Compareitems extends Module {
         echo "Viskas veikia";
     }
 
-    public function hookDisplayProductPriceBlock()
+    public function hookDisplayProductPriceBlock($params)
     {
-        echo "Compare";
+        if ($params['type'] == 'unit_price') {
+            $this->context->smarty->assign('helloWorld', 0);
+            return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems.tpl');
+//            echo "Compare";
+        }
     }
 
     public function hookDisplayProductListReviews()
