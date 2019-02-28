@@ -29,6 +29,8 @@ class Compareitems extends Module {
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayProductPriceBlock') &&
             $this->registerHook('displayProductListReviews');
+
+
     }
 
     public function uninstall()
@@ -53,5 +55,19 @@ class Compareitems extends Module {
     public function hookDisplayProductListReviews()
     {
         echo "Review";
+    }
+
+    protected function createTables()
+    {
+        /* Comparing Items*/
+        $res = (bool)Db::getInstance()->execute('
+            CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'comparingitems` (
+                `id_customer` int(10) unsigned NOT NULL,
+                `id_product` int(10) unsigned NOT NULL,
+                PRIMARY KEY (`id_customer`, `id_item`)
+            ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=UTF8;
+        ');
+
+        return $res;
     }
 }
