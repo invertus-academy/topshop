@@ -77,4 +77,32 @@ class Compareitems extends Module {
     {
         echo "Review";
     }
+    public function getContent()
+    {
+        $controllerLink = Context::getContext()->link->getAdminLink('AdminCompareItemsConfiguration');
+
+        Tools::redirectAdmin($controllerLink);
+    }
+
+    public function getTabs()
+    {
+        return [
+            [
+                'name' => 'compareitems',
+                'parent_class_name' => 'AdminParentModulesSf',
+                'class_name' => 'AdminCompareItemsParent',
+                'visible' => false,
+            ],
+            [
+                'name' => 'Configuration',
+                'parent_class_name' => 'AdminCompareItemsParent',
+                'class_name' => 'AdminCompareItemsConfiguration',
+            ]
+        ];
+    }
+
+
+
+
+
 }
