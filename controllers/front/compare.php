@@ -3,7 +3,7 @@
 
 
 
-class CompareitemsCompareModuleFrontController extends ModuleFrontController
+class CompareItemsCompareModuleFrontController extends ModuleFrontController
 {
     public function __construct()
     {

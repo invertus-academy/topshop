@@ -18,9 +18,7 @@ class Compareitems extends Module {
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-//        if (!Configuration::get('MYMODULE_NAME')) {
-//            $this->warning = $this->l('No name provided.');
-//        }
+
     }
 
     public function install()
@@ -32,6 +30,8 @@ class Compareitems extends Module {
             $this->registerHook('displayProductButtons') &&
             $this->registerHook('displayShoppingCart') &&
             $this->registerHook('displayHome') &&
+            $this->registerHook('displayNav2') &&
+
 
             $this->registerHook('displayProductListReviews');
 
@@ -42,25 +42,24 @@ class Compareitems extends Module {
         return parent::uninstall();
     }
 
-    public function hookDisplayHeader()
+
+
+    public function hookDisplayNav2()
     {
-        echo "Viskas veikia";
+        $this->context->smarty->assign([
+            'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
+        ]);
+        $this->context->controller->addCSS($this->_path.'css/compareitems_top_link.css', 'all');
+        return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems_top_link.tpl');
+
     }
-    
-//    public function hookDisplayProductAdditionalInfo($params)
-  //  {
-//        echo "<button class=\"btn btn-primary\" data-button-action=\"add-to-comparison\" type=\"submit\">
-//            Add to comparison
-//          </button>";
-//        if ($params['type'] == 'unit_price') {
-//            $this->context->smarty->assign('button', 0);
-//            return $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/hook/compareitems.tpl');
-//        }
-        
-    //}
 
     public function hookDisplayProductButtons()
     {
+        $this->context->smarty->assign([
+            'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
+        ]);
+
         return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/button.tpl');
     }
 
