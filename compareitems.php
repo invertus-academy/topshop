@@ -25,29 +25,29 @@ class CompareItems extends Module {
         }
     }
 
-    public function getContent()
-    {
-        $controllerLink = Context::getContext()->link->getAdminLink('AdminCompareItemsConfiguration');
-
-        Tools::redirectAdmin($controllerLink);
-    }
-
-    public function getTabs()
-    {
-        return [
-            [
-                'name' => 'compareitems',
-                'parent_class_name' => 'AdminParentModulesSf',
-                'class_name' => 'AdminCompareItemsParent',
-                'visible' => false,
-            ],
-            [
-                'name' => 'Configuration',
-                'parent_class_name' => 'AdminCompareItemsParent',
-                'class_name' => 'AdminCompareItemsConfiguration',
-            ]
-        ];
-    }
+//    public function getContent()
+//    {
+//        $controllerLink = Context::getContext()->link->getAdminLink('AdminCompareItemsConfiguration');
+//
+//        Tools::redirectAdmin($controllerLink);
+//    }
+//
+//    public function getTabs()
+//    {
+//        return [
+//            [
+//                'name' => 'compareitems',
+//                'parent_class_name' => 'AdminParentModulesSf',
+//                'class_name' => 'AdminCompareItemsParent',
+//                'visible' => false,
+//            ],
+//            [
+//                'name' => 'Configuration',
+//                'parent_class_name' => 'AdminCompareItemsParent',
+//                'class_name' => 'AdminCompareItemsConfiguration',
+//            ]
+//        ];
+//    }
 
     public function install()
     {
@@ -55,8 +55,11 @@ class CompareItems extends Module {
 
         return parent::install() &&
             $this->registerHook('displayHeader') &&
-            $this->registerHook('displayProductPriceBlock')
-            && Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', 3);
+            $this->registerHook('displayProductPriceBlock') &&
+            Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', 3) &&
+            Configuration::updateValue('ENABLE_PRODUCT_COMPARE', 1) &&
+            Configuration::updateValue('ENABLE_PRODUCT_COMPARE_LIST', 1) &&
+            Configuration::updateValue('ENABLE_PRODUCT_COMPARE_PAGE', 1);
     }
 
     public function uninstall()
@@ -80,7 +83,7 @@ class CompareItems extends Module {
     public function hookDisplayProductPriceBlock($params)
     {
         if ($params['type'] == 'unit_price') {
-            $this->context->smarty->assign('helloWorld', 'Compare');
+            $this->context->smarty->assign('compareButton', 'Add to Compare');
             return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems.tpl');
         }
     }
@@ -109,26 +112,27 @@ class CompareItems extends Module {
         ');
     }
 
-/*    public function getContent()
+    public function getContent()
     {
         $output = null;
 
         if (Tools::isSubmit('submit'.$this->name)) {
-            $myModuleName = strval(Tools::getValue('MYMODULE_NAME'));
             $myModuleComparisonNumber = strval(Tools::getValue('MYMODULE_COMPARISON_NUMBER'));
+            $myModuleComparisonEnable = strval(Tools::getValue('ENABLE_PRODUCT_COMPARE'));
+            $myModuleComparisonEnableList = strval(Tools::getValue('ENABLE_PRODUCT_COMPARE_LIST'));
+            $myModuleComparisonEnablePage = strval(Tools::getValue('ENABLE_PRODUCT_COMPARE_PAGE'));
 
             if (
-                !$myModuleName ||
                 !$myModuleComparisonNumber ||
-                empty($myModuleName) ||
                 empty($myModuleComparisonNumber) ||
-                !Validate::isGenericName($myModuleName) ||
                 !Validate::isGenericName($myModuleComparisonNumber)
             ) {
                 $output .= $this->displayError($this->l('Invalid Configuration value'));
             } else {
-                Configuration::updateValue('MYMODULE_NAME', $myModuleName);
                 Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', $myModuleComparisonNumber);
+                Configuration::updateValue('ENABLE_PRODUCT_COMPARE', $myModuleComparisonEnable);
+                Configuration::updateValue('ENABLE_PRODUCT_COMPARE_LIST', $myModuleComparisonEnableList);
+                Configuration::updateValue('ENABLE_PRODUCT_COMPARE_PAGE', $myModuleComparisonEnablePage);
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
@@ -145,40 +149,76 @@ class CompareItems extends Module {
         $fieldsForm[0]['form'] = [
             'legend' => [
                 'title' => $this->l('Settings'),
+                'icon' => 'icon-cogs',
             ],
             'input' => [
-                [
-                    'type' => 'text',
-                    'label' => $this->l('Configuration value'),
-                    'name' => 'MYMODULE_NAME',
-                    'size' => 20,
-                    'required' => true
-                ],
                 [
                     'type' => 'text',
                     'label' => $this->l('Products comparison'),
                     'name' => 'MYMODULE_COMPARISON_NUMBER',
                     'size' => 20,
-                    'required' => true
                 ],
                 [
                     'type' => 'switch',
                     'label' => $this->l(
-                        'Enamble Product Compare',
+                        'Enable Product Compare',
                         [],
                         'Modules.Contactform.Admin'
                     ),
-                    'name' => 'ENAMBLE_PRODUCT_COMPARE',
+                    'name' => 'ENABLE_PRODUCT_COMPARE',
                     'is_bool' => true,
-                    'required' => true,
                     'values' => [
                         [
-                            'id' => 'ENAMBLE_PRODUCT_COMPARE' . '_on',
+                            'id' => 'ENABLE_PRODUCT_COMPARE' . '_on',
                             'value' => 1,
                             'label' => $this->l('Enabled', [], 'Admin.Global')
                         ],
                         [
-                            'id' => 'ENAMBLE_PRODUCT_COMPARE' . '_off',
+                            'id' => 'ENABLE_PRODUCT_COMPARE' . '_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled', [], 'Admin.Global')
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'switch',
+                    'label' => $this->l(
+                        'Show product compare at product list',
+                        [],
+                        'Modules.Contactform.Admin'
+                    ),
+                    'name' => 'ENABLE_PRODUCT_COMPARE_LIST',
+                    'is_bool' => true,
+                    'values' => [
+                        [
+                            'id' => 'ENABLE_PRODUCT_COMPARE_LIST' . '_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled', [], 'Admin.Global')
+                        ],
+                        [
+                            'id' => 'ENABLE_PRODUCT_COMPARE_LIST' . '_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled', [], 'Admin.Global')
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'switch',
+                    'label' => $this->l(
+                        'Show product compare at product page',
+                        [],
+                        'Modules.Contactform.Admin'
+                    ),
+                    'name' => 'ENABLE_PRODUCT_COMPARE_PAGE',
+                    'is_bool' => true,
+                    'values' => [
+                        [
+                            'id' => 'ENABLE_PRODUCT_COMPARE_PAGE' . '_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled', [], 'Admin.Global')
+                        ],
+                        [
+                            'id' => 'ENABLE_PRODUCT_COMPARE_LIST' . '_off',
                             'value' => 0,
                             'label' => $this->l('Disabled', [], 'Admin.Global')
                         ]
@@ -221,28 +261,12 @@ class CompareItems extends Module {
         ];
 
         // Load current value
-        $helper->fields_value['MYMODULE_NAME'] = Configuration::get('MYMODULE_NAME');
         $helper->fields_value['MYMODULE_COMPARISON_NUMBER'] = Configuration::get('MYMODULE_COMPARISON_NUMBER');
+        $helper->fields_value['ENABLE_PRODUCT_COMPARE'] = Configuration::get('ENABLE_PRODUCT_COMPARE');
+        $helper->fields_value['ENABLE_PRODUCT_COMPARE_LIST'] = Configuration::get('ENABLE_PRODUCT_COMPARE_LIST');
+        $helper->fields_value['ENABLE_PRODUCT_COMPARE_PAGE'] = Configuration::get('ENABLE_PRODUCT_COMPARE_PAGE');
 
         return $helper->generateForm($fieldsForm);
-    }*/
-
-/*    public function getTabs()
-    {
-        //return parent::getTabs(); // TODO: Change the autogenerated stub
-
-        return [
-            [
-                'name' => 'compareitems',
-                'parent_class_name' => 'AdminParentModulesSf',
-                'class_name' => 'AdminTestModuleParent',
-                'visible' => false,
-            ],
-            [
-                'name' => 'Configuration',
-                'parent_class_name' => 'AdminTestModuleParent',
-            ]
-        ];
-    }*/
+    }
 
 }
