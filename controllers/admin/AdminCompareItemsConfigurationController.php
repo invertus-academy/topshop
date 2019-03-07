@@ -8,10 +8,8 @@
 
 class AdminCompareItemsConfigurationController extends ModuleAdminController
 {
-/*    public function __construct()
+    public function __construct()
     {
-        parent::__construct();
-        echo "Hello World!";
-    }*/
+    }
 
 }
