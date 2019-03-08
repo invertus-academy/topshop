@@ -17,6 +17,7 @@ class CompareItems extends Module {
 
         $this->displayName = $this->l('Compare Items');
         $this->description = $this->l('Description of my module.');
+        $this->controllers = ['ajax'];
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
