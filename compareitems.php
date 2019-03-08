@@ -63,7 +63,7 @@ class CompareItems extends Module {
     public function hookDisplayProductPriceBlock($params)
     {
         if ($params['type'] == 'unit_price') {
-            $this->context->smarty->assign('helloWorld', 'Compare');
+            $this->context->smarty->assign('compareButton', 'Add to Compare');
             return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems.tpl');
         }
     }
