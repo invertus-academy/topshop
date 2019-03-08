@@ -18,6 +18,10 @@ class CompareItems extends Module {
         $this->displayName = $this->l('Compare Items');
         $this->description = $this->l('Description of my module.');
 
+        $this->controllers = [
+            'ajax',
+        ];
+
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         if (!Configuration::get('MYMODULE_NAME')) {
@@ -56,6 +60,7 @@ class CompareItems extends Module {
         return parent::install() &&
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayProductPriceBlock') &&
+            $this->registerHook('displayAdminProductsExtra') &&
             Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', 3) &&
             Configuration::updateValue('ENABLE_PRODUCT_COMPARE', 1) &&
             Configuration::updateValue('ENABLE_PRODUCT_COMPARE_LIST', 1) &&
@@ -75,9 +80,14 @@ class CompareItems extends Module {
         return false;
     }
 
-    public function hookDisplayHeader()
+//    public function hookDisplayHeader()
+//    {
+//        echo "Viskas veikia";
+//    }
+
+    public function hookDisplayAdminProductsExtra()
     {
-        echo "Viskas veikia";
+        return "New Tab";
     }
 
     public function hookDisplayProductPriceBlock($params)
