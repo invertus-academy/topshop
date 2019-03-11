@@ -53,6 +53,8 @@ class CompareItems extends Module {
     public function install()
     {
         return parent::install() &&
+            $this->registerHook('displayProductButtons') &&
+            $this->registerHook('displayNav2') &&
             $this->registerHook('displayProductPriceBlock') &&
             Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', 3) &&
             Configuration::updateValue('ENABLE_PRODUCT_COMPARE', 1) &&
@@ -63,6 +65,25 @@ class CompareItems extends Module {
     public function uninstall()
     {
         return parent::uninstall();
+    }
+
+    public function hookDisplayNav2()
+    {
+        $this->context->smarty->assign([
+            'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
+        ]);
+
+        return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compare_items_top_link.tpl');
+
+    }
+
+    public function hookDisplayProductButtons()
+    {
+        $this->context->smarty->assign([
+            'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
+        ]);
+
+        return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/button.tpl');
     }
 
     public function hookDisplayProductPriceBlock($params)
