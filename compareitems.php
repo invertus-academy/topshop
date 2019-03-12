@@ -69,16 +69,23 @@ class CompareItems extends Module {
 
     public function hookDisplayNav2()
     {
+        if (!Configuration::get('ENABLE_PRODUCT_COMPARE')) {
+            return;
+        }
+
         $this->context->smarty->assign([
             'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
         ]);
 
         return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compare_items_top_link.tpl');
-
     }
 
     public function hookDisplayProductButtons()
     {
+        if (!Configuration::get('ENABLE_PRODUCT_COMPARE_PAGE') || !Configuration::get('ENABLE_PRODUCT_COMPARE')) {
+            return;
+        }
+
         $this->context->smarty->assign([
             'comparison_link' => $this->context->link->getModuleLink('compareitems', 'compare')
         ]);
@@ -88,8 +95,12 @@ class CompareItems extends Module {
 
     public function hookDisplayProductPriceBlock($params)
     {
+        if (!Configuration::get('ENABLE_PRODUCT_COMPARE_LIST') || !Configuration::get('ENABLE_PRODUCT_COMPARE')) {
+            return;
+        }
+
         if ($params['type'] == 'unit_price') {
-            $this->context->smarty->assign('compareButton', 'Add to Compare');
+            $this->context->smarty->assign('compareButton', 'Add to Comparison');
             return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems.tpl');
         }
     }
