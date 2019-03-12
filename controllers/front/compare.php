@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 class CompareItemsCompareModuleFrontController extends ModuleFrontController
 {
     public function __construct()
