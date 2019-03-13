@@ -6,22 +6,64 @@ class CompareItemsCompareModuleFrontController extends ModuleFrontController
     {
         parent::__construct();
     }
-    public function init()
+
+    private function getProductsFromSql()
     {
-        parent::init();
+        $query = new DbQuery();
+        $query
+            ->select('p.*, product_shop.*, pl.`name`, pl.`link_rewrite`, i.`id_image`, i.`cover`')
+            ->from('product', 'p')
+            ->innerJoin(
+                'product_lang',
+                'pl',
+                'pl.`id_product`=p.`id_product` AND pl.`id_lang` = ' . $this->context->language->id .
+                ' AND pl.`id_shop`=' . $this->context->shop->id
+            )
+            ->leftJoin(
+                'image_shop',
+                'i',
+                'i.`id_product` = p.`id_product` AND i.`cover` = 1 AND i.`id_shop` = ' . (int)$this->context->shop->id
+            )
+            ->join(Shop::addSqlAssociation('product', 'p'));
+
+        return Db::getInstance()->executeS($query);
     }
+
     public function initContent()
     {
         parent::initContent();
+
+        $productsFromSql = $this->getProductsFromSql();
+
+        $productsReadyFormTemplate = [];
+
+        foreach ($productsFromSql as $item) {
+            $productsReadyFormTemplate[] = Product::getProductProperties($this->context->language->id, $item);
+        }
+
+        $this->addColorsToProductList($productsReadyFormTemplate);
+
         $this->context->smarty->assign(array(
-            'number_of_product' => Db::getInstance()->getValue('SELECT COUNT(*) FROM `'._DB_PREFIX_.'product`'),
-            'categories' => Db::getInstance()->executeS('SELECT `id_category`, `name` FROM `'._DB_PREFIX_.'category_lang` WHERE `id_lang`='.(int) $this->context->language->id),
-            'shop_name' => Configuration::get('PS_SHOP_NAME'),
-            'manufacturer' => Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'manufacturer`'),
-            'products' => Db::getInstance()->executeS('SELECT p.`id_product`, p.`price`, pl.`name` FROM `ps_product` p INNER JOIN `ps_product_lang` pl ON (pl.`id_lang` = 1 AND pl.`id_product` = p.`id_product`)'),
+            'products' => $productsReadyFormTemplate,
         ));
 
-        $this->context->smarty->assign(array());
         $this->setTemplate('module:compareitems/views/templates/front/compare.tpl');
+    }
+
+    public function postProcess()
+    {
+        //todo: how to save to cookie sample
+        if ('saveProduct' === Tools::getValue('action')) {
+            $productId = Tools::getValue('id_product');
+
+            $existingProducts = $this->context->cookie->compareItemsProducts;
+
+            if (!in_array($productId, [$existingProducts])) {
+                $existingProducts[] = $productId;
+            }
+
+            $this->context->cookie->compareItemsProducts = [$existingProducts];
+        }
+
     }
 }

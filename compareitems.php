@@ -17,7 +17,7 @@ class CompareItems extends Module {
 
         $this->displayName = $this->l('Compare Items');
         $this->description = $this->l('Description of my module.');
-        $this->controllers = ['ajax'];
+        $this->controllers = ['compare'];
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -56,6 +56,7 @@ class CompareItems extends Module {
             $this->registerHook('displayProductButtons') &&
             $this->registerHook('displayNav2') &&
             $this->registerHook('displayProductPriceBlock') &&
+            $this->registerHook('header') &&
             Configuration::updateValue('MYMODULE_COMPARISON_NUMBER', 3) &&
             Configuration::updateValue('ENABLE_PRODUCT_COMPARE', 1) &&
             Configuration::updateValue('ENABLE_PRODUCT_COMPARE_LIST', 1) &&
@@ -65,6 +66,16 @@ class CompareItems extends Module {
     public function uninstall()
     {
         return parent::uninstall();
+    }
+
+    public function hookHeader()
+    {
+        $this->context->controller->addCSS(array(
+            $this->_path.'views/css/compareitems.css'
+        ));
+        $this->context->controller->addJS(array(
+            $this->_path.'views/js/compareitems.js'
+        ));
     }
 
     public function hookDisplayNav2()

@@ -17,6 +17,18 @@ class CompareItemsAjaxModuleFrontController extends ModuleFrontController
     }
     public function postProcess()
     {
+        //todo: how to save to cookie sample
+        if ('saveProduct' === Tools::getValue('action')) {
+            $productId = Tools::getValue('id_product');
+
+            $existingProducts = $this->context->cookie->compareItemsProducts;
+
+            if (!in_array($productId, $existingProducts)) {
+                $existingProducts[] = $productId;
+            }
+
+            $this->context->cookie->compareItemsProducts = [$existingProducts];
+        }
         parent::postProcess();
     }
     public function setMedia()
