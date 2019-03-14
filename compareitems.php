@@ -111,7 +111,10 @@ class CompareItems extends Module {
         }
 
         if ($params['type'] == 'unit_price') {
-            $this->context->smarty->assign('compareButton', 'Add to Comparison');
+            $this->context->smarty->assign(array(
+                'compareButton' => 'Add to Comparison',
+                'productId' => $params['product']->getId()
+            ));
             return $this->context->smarty->fetch($this->getLocalPath().'views/templates/hook/compareitems.tpl');
         }
     }

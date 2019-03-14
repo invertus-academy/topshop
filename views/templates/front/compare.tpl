@@ -6,11 +6,11 @@
         {$numOfCols = 4}
         {$rowCount = 0}
         {$bootstrapColWidth = 12 / $numOfCols}
-        {$productId = Context::getContext()->cookie->productId}
+        {*{$productIds = Context::getContext()->cookie->productIds}*}
 
         <div class="row">
             {foreach from=$products item="product"}
-                {if {$product['id_product']} == {$productId} }
+                {if in_array({$product['id_product']}, $productIds)}
                     <div class="col-md-{$bootstrapColWidth}">
                         <div class="thumbnail-container">
                             {block name='product_thumbnail'}

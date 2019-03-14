@@ -45,6 +45,7 @@ class CompareItemsCompareModuleFrontController extends ModuleFrontController
 
         $this->context->smarty->assign(array(
             'products' => $productsReadyFormTemplate,
+            'productIds' => json_decode($this->context->cookie->productIds),
         ));
 
         $this->setTemplate('module:compareitems/views/templates/front/compare.tpl');
@@ -54,8 +55,14 @@ class CompareItemsCompareModuleFrontController extends ModuleFrontController
     {
         //todo: how to save to cookie sample
         if (Tools::isSubmit('saveProduct')) {
-            $productId = 15;
-            $this->context->cookie->productId = $productId;
+            if (!isset($this->context->cookie->productIds)) {
+                $productIds = [];
+            } else {
+                $productIds = json_decode($this->context->cookie->productIds);
+            }
+            $productId = Tools::getValue('id_product_compare');
+            $productIds[] = $productId;
+            $this->context->cookie->productIds = json_encode($productIds);
             $this->context->cookie->write();
         }
     }
