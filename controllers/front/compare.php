@@ -60,10 +60,16 @@ class CompareItemsCompareModuleFrontController extends ModuleFrontController
             } else {
                 $productIds = json_decode($this->context->cookie->productIds);
             }
+
+            if (count($productIds) >= (int)Configuration::get('MYMODULE_COMPARISON_NUMBER'))
+            {
+                return;
+            }
             $productId = Tools::getValue('id_product_compare');
             $productIds[] = $productId;
             $this->context->cookie->productIds = json_encode($productIds);
             $this->context->cookie->write();
+
         }
     }
 }
